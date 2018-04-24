@@ -1,6 +1,7 @@
 package com.ricoh.orders.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -18,17 +19,40 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-	static final String CLIEN_ID = "devglan-client";
-	static final String CLIENT_SECRET = "devglan-secret";
+	static final String CLIEN_ID = "client";
+	static final String CLIENT_SECRET = "secret";
 	static final String GRANT_TYPE_PASSWORD = "password";
 	static final String AUTHORIZATION_CODE = "authorization_code";
-    static final String REFRESH_TOKEN = "refresh_token";
     static final String IMPLICIT = "implicit";
 	static final String SCOPE_READ = "read";
 	static final String SCOPE_WRITE = "write";
-    static final String TRUST = "trust";
-	static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1*60*60;
-    static final int FREFRESH_TOKEN_VALIDITY_SECONDS = 6*60*60;
+	
+	@Value("${security.oauth.client_id}")
+	private String client_id;
+	
+    @Value("${security.oauth.secret}")
+	private String secret;
+
+	@Value("${security.oauth.grant_type_password}")
+	private String grant_type_password;
+
+	@Value("${security.oauth.grant_type_authorization_code}")
+	private String grant_type_authorization_code;
+
+	@Value("${security.oauth.grant_type_implicit}")
+	private String grant_type_implicit;
+
+	@Value("${security.oauth.scope_read}")
+	private String scope_read;
+	
+	@Value("${security.oauth.scope_write}")
+	private String scope_write;
+	
+	@Value("${security.oauth.signing_key}")
+	private String signing_key;
+	
+	@Value("${security.oauth.access_token_validity}")
+	private int access_token_validity;
 	
 	@Autowired
     private AuthenticationManager authenticationManager;
@@ -41,11 +65,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-            .withClient("client")
-            .secret("secret")
-            .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, IMPLICIT )
-            .scopes("read", "write")
-            .accessTokenValiditySeconds(3600);
+            .withClient(client_id)
+            .secret(secret)
+            .authorizedGrantTypes(grant_type_password, grant_type_authorization_code, grant_type_implicit)
+            .scopes(scope_read, scope_write)
+            .accessTokenValiditySeconds(access_token_validity);
     }
 
 	@Bean
@@ -56,7 +80,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-		converter.setSigningKey("123");
+		converter.setSigningKey(signing_key);
 		return converter;
 	}
 

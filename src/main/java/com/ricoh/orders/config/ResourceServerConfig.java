@@ -1,5 +1,6 @@
 package com.ricoh.orders.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -13,6 +14,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
+	@Value("${security.oauth.signing_key}")
+	private String signing_key;
+	
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) {
 		resources.tokenStore(tokenStore());
@@ -26,7 +30,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-		converter.setSigningKey("123");
+		converter.setSigningKey(signing_key);
 		return converter;
 	}
 

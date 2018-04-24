@@ -1,6 +1,7 @@
 package com.ricoh.orders.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -15,20 +16,31 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+	@Value("${spring.security.user}")
+	private String user;
+	
+    @Value("${spring.security.user.password}")
+	private String user_password;
+
+	@Value("${spring.security.admin}")
+	private String admin;
+
+	@Value("${spring.security.admin.password}")
+	private String admin_password;
+
+	@Value("${spring.security.rol_user}")
+	private String rol_user;
+
+	@Value("${spring.security.rol_admin}")
+	private String rol_admin;
+	
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .csrf()
-            .disable()
-            .headers()
-            .frameOptions()
-            .disable()
-        .and()
-        	.sessionManagement()
-        	.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-            .authorizeRequests()
-            .anyRequest().authenticated();
+            .csrf().disable()
+            .headers().frameOptions().disable()
+            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().authorizeRequests().anyRequest().authenticated();
     }
 	
 //	@Override
@@ -57,9 +69,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
 		auth.inMemoryAuthentication()
-			.withUser("user").password("pass1234").roles("USER")
+			.withUser(user).password(user_password).roles(rol_user)
 			.and()
-			.withUser("admin").password("pass1234").roles("USER", "ADMIN");
+			.withUser(admin).password(admin_password).roles(rol_user, rol_admin);
 	}
     
 }
